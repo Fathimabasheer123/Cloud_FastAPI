@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI CRUD Operations</title>
+    <style>
+        body {
+            background-color: whitesmoke;
+        }
+        .container {
+            width: 60%;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: green;
+        }
+        input[type="text"], input[type="number"], button{
+            padding: 8px;
+            width: 100%;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        button{
+            background-color: rgb(21, 173, 21);
+            width: 40%;
+            display: block;
+            padding: 10px;
+            margin: 20px auto;
+        }  
+       
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Form to Create Item -->
+        <h2>Create New Item</h2>
+        
+        <input type="text" id="name" placeholder="Enter item name">
+        
+       
+        <input type="text" id="description" placeholder="Enter item description">
+        
+        
+        <input type="number" id="price" placeholder="Enter item price">
+        
+        
+        <input type="number" id="stock" placeholder="Enter item stock">
+        
+        <button type="button" id="addItem">Add Item</button>
+        
+        <!-- Table to Display Items -->
+        <h2>Items List</h2>
+        <table id="table">
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody id="list"></tbody>
+        </table>
+    </div>
+    
+    <script>
+        const tableBody=document.getElementById("list");
+        async function fetchItems() {
+            const response = await fetch('/items/');
+            const items = await response.json();
+            renderItems(items);
+        }
+        
+        // Render items in the table
+        function renderItems(items) {
+            tableBody.innerHTML = "";
+            items.forEach((item) => {
+                const row = document.createElement("tr");
+                row.innerHTML =`
+                <td>${item.id}</td>
+                <td>${item.name}</td>
+                <td>${item.description}</td>
+                <td>${item.price}</td>
+                <td>${item.stock}</td>
+               `;
+            tableBody.appendChild(row);
+        });
+    }
+
+
+        document.getElementById("addItem").addEventListener("click", async () => {
+            const name = document.getElementById("name").value;
+            const description = document.getElementById("description").value;
+            const price = parseFloat(document.getElementById("price").value);
+            const stock = parseInt(document.getElementById("stock").value);
+            const newItem = { name, description, price, stock };
+            
+            const response = await fetch('/items', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newItem)
+            });
+            if (response.ok) {
+                fetchItems();  
+                clearForm();
+            }
+        });
+        function clearForm() {
+            document.getElementById("name").value = "";
+            document.getElementById("description").value = "";
+            document.getElementById("price").value = "";
+            document.getElementById("stock").value = "";
+        }
+        fetchItems();   
+
+           
+        
+    </script>
+</body>
+</html>
